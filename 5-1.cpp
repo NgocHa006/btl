@@ -1,37 +1,20 @@
-#include <iostream>
+#include <stdio.h>
 #include "QuanLy.h"
-
-using namespace std;
 
 int main() {
     int chon;
-
     nhapMonHoc();
 
     do {
-        cout << "\n===== QUAN LY SINH VIEN =====\n";
-        cout << "1. Them sinh vien\n";
-        cout << "2. Tinh diem trung binh\n";
-        cout << "3. Xuat file (Giam dan)\n";
-        cout << "4. Xuat file (Tang dan)\n";
-        cout << "0. Thoat\n";
-        cout << "Chon: ";
-        cin >> chon;
+        printf("\n1.Them SV\n2.Tinh DTB\n3.Xuat giam\n4.Xuat tang\n0.Thoat\nChon: ");
+        scanf("%d", &chon);
+        getchar();
 
-        switch (chon) {
-        case 1:
-            themSinhVien();
-            break;
-        case 2:
-            tinhDiemTB();
-            break;
-        case 3:
-            sapXepVaXuatFile(true);
-            break;
-        case 4:
-            sapXepVaXuatFile(false);
-            break;
-        }
+        if (chon == 1) themSinhVien();
+        else if (chon == 2) tinhDiemTB();
+        else if (chon == 3) sapXepVaXuatFile(1);
+        else if (chon == 4) sapXepVaXuatFile(0);
+
     } while (chon != 0);
 
     return 0;

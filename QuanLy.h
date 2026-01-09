@@ -1,16 +1,13 @@
 ﻿#pragma once
-#include <string>
-#include <unordered_map>
 #include "SinhVien.h"
 
-#define MAX_SV 100
-
-extern std::string danhSachMon[MAX_MON];
+extern char danhSachMon[MAX_MON][MAX_LEN];
 extern int soMonHoc;
 
-extern std::unordered_map<std::string, SinhVien> bangBam;
+extern SinhVien ds[MAX_SV];
+extern int soSV;
 
 void nhapMonHoc();
 void themSinhVien();
 void tinhDiemTB();
-void sapXepVaXuatFile(bool giamDan);
+void sapXepVaXuatFile(int giamDan);

@@ -1,90 +1,87 @@
-﻿#include "QuanLy.h"
-#include <iostream>
-#include <fstream>
+﻿#include <stdio.h>
+#include <string.h>
+#include "QuanLy.h"
 
-using namespace std;
-
-string danhSachMon[MAX_MON];
+char danhSachMon[MAX_MON][MAX_LEN];
 int soMonHoc = 0;
-unordered_map<string, SinhVien> bangBam;
+
+SinhVien ds[MAX_SV];
+int soSV = 0;
+
 
 void nhapMonHoc() {
-    cout << "Nhap so mon hoc (<= " << MAX_MON << "): ";
-    cin >> soMonHoc;
-    cin.ignore();
+    printf("Nhap so mon hoc: ");
+    scanf("%d", &soMonHoc);
+    getchar();
 
     for (int i = 0; i < soMonHoc; i++) {
-        cout << "Ten mon " << i + 1 << ": ";
-        getline(cin, danhSachMon[i]);
+        printf("Ten mon %d: ", i + 1);
+        gets(danhSachMon[i]);
     }
 }
 
 void themSinhVien() {
     SinhVien sv;
-    cout << "Ma SV: ";
-    cin >> sv.maSV;
 
-    if (bangBam.count(sv.maSV)) {
-        cout << "Ma SV da ton tai!\n";
-        return;
+    printf("Ma SV: ");
+    gets(sv.maSV);
+
+    for (int i = 0; i < soSV; i++) {
+        if (strcmp(ds[i].maSV, sv.maSV) == 0) {
+            printf("Ma SV da ton tai!\n");
+            return;
+        }
     }
 
-    cin.ignore();
-    cout << "Ho ten: ";
-    getline(cin, sv.hoTen);
+    printf("Ho ten: ");
+    gets(sv.hoTen);
 
     sv.soMon = soMonHoc;
     for (int i = 0; i < soMonHoc; i++) {
-        cout << "Diem " << danhSachMon[i] << ": ";
-        cin >> sv.diem[i];
+        printf("Diem %s: ", danhSachMon[i]);
+        scanf("%f", &sv.diem[i]);
     }
+    getchar();
 
-    bangBam[sv.maSV] = sv;
+    sv.diemTB = 0;
+    ds[soSV++] = sv;
 }
 
 void tinhDiemTB() {
-    for (auto& p : bangBam) {
+    for (int i = 0; i < soSV; i++) {
         float tong = 0;
-        for (int i = 0; i < p.second.soMon; i++)
-            tong += p.second.diem[i];
-        p.second.diemTB = tong / p.second.soMon;
+        for (int j = 0; j < ds[i].soMon; j++)
+            tong += ds[i].diem[j];
+        ds[i].diemTB = tong / ds[i].soMon;
     }
 }
 
-void sapXepVaXuatFile(bool giamDan) {
-    SinhVien ds[MAX_SV];
-    int n = 0;
-
-    for (auto& p : bangBam)
-        ds[n++] = p.second;
-
-    // Bubble sort (dễ hiểu)
-    for (int i = 0; i < n - 1; i++) {
-        for (int j = i + 1; j < n; j++) {
-            bool dieuKien = giamDan ?
+void sapXepVaXuatFile(int giamDan) {
+    for (int i = 0; i < soSV - 1; i++) {
+        for (int j = i + 1; j < soSV; j++) {
+            int dk = giamDan ?
                 ds[i].diemTB < ds[j].diemTB :
                 ds[i].diemTB > ds[j].diemTB;
 
-            if (dieuKien) {
-                SinhVien tmp = ds[i];
+            if (dk) {
+                SinhVien t = ds[i];
                 ds[i] = ds[j];
-                ds[j] = tmp;
+                ds[j] = t;
             }
         }
     }
 
-    ofstream file("bang_diem.csv");
-    file << "MaSV,HoTen";
+    FILE* f = fopen("bang_diem.csv", "w");
+    fprintf(f, "MaSV,HoTen");
     for (int i = 0; i < soMonHoc; i++)
-        file << "," << danhSachMon[i];
-    file << ",DiemTB\n";
+        fprintf(f, ",%s", danhSachMon[i]);
+    fprintf(f, ",DiemTB\n");
 
-    for (int i = 0; i < n; i++) {
-        file << ds[i].maSV << "," << ds[i].hoTen;
+    for (int i = 0; i < soSV; i++) {
+        fprintf(f, "%s,%s", ds[i].maSV, ds[i].hoTen);
         for (int j = 0; j < ds[i].soMon; j++)
-            file << "," << ds[i].diem[j];
-        file << "," << ds[i].diemTB << "\n";
+            fprintf(f, ",%.2f", ds[i].diem[j]);
+        fprintf(f, ",%.2f\n", ds[i].diemTB);
     }
-
-    file.close();
+    fclose(f);
 }

@@ -1,12 +1,13 @@
 ﻿#pragma once
-#include <string>
 
+#define MAX_SV 1000   
 #define MAX_MON 10
+#define MAX_LEN 50
 
 struct SinhVien {
-    std::string maSV;
-    std::string hoTen;
+    char maSV[MAX_LEN];
+    char hoTen[MAX_LEN];
     float diem[MAX_MON];
-    int soMon = 0;
-    float diemTB = 0;
+    int soMon;
+    float diemTB;
 };
