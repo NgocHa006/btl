@@ -1,10 +1,12 @@
 ﻿#pragma once
 #include <string>
-#include <vector>
+
+#define MAX_MON 10
 
 struct SinhVien {
     std::string maSV;
     std::string hoTen;
-    std::vector<float> diem;
+    float diem[MAX_MON];
+    int soMon = 0;
     float diemTB = 0;
 };

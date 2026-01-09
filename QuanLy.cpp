@@ -1,37 +1,30 @@
 ﻿#include "QuanLy.h"
 #include <iostream>
 #include <fstream>
-#include <algorithm>
 
 using namespace std;
 
-// Định nghĩa biến toàn cục
-vector<string> danhSachMon;
+string danhSachMon[MAX_MON];
+int soMonHoc = 0;
 unordered_map<string, SinhVien> bangBam;
 
-// Nhập danh sách môn học
 void nhapMonHoc() {
-    int n;
-    cout << "Nhap so mon hoc: ";
-    cin >> n;
+    cout << "Nhap so mon hoc (<= " << MAX_MON << "): ";
+    cin >> soMonHoc;
     cin.ignore();
 
-    danhSachMon.clear();
-    for (int i = 0; i < n; i++) {
-        string ten;
+    for (int i = 0; i < soMonHoc; i++) {
         cout << "Ten mon " << i + 1 << ": ";
-        getline(cin, ten);
-        danhSachMon.push_back(ten);
+        getline(cin, danhSachMon[i]);
     }
 }
 
-// Thêm sinh viên (HASH TABLE)
 void themSinhVien() {
     SinhVien sv;
     cout << "Ma SV: ";
     cin >> sv.maSV;
 
-    if (bangBam.find(sv.maSV) != bangBam.end()) {
+    if (bangBam.count(sv.maSV)) {
         cout << "Ma SV da ton tai!\n";
         return;
     }
@@ -40,8 +33,8 @@ void themSinhVien() {
     cout << "Ho ten: ";
     getline(cin, sv.hoTen);
 
-    sv.diem.resize(danhSachMon.size());
-    for (int i = 0; i < danhSachMon.size(); i++) {
+    sv.soMon = soMonHoc;
+    for (int i = 0; i < soMonHoc; i++) {
         cout << "Diem " << danhSachMon[i] << ": ";
         cin >> sv.diem[i];
     }
@@ -49,37 +42,48 @@ void themSinhVien() {
     bangBam[sv.maSV] = sv;
 }
 
-// Tính điểm trung bình
 void tinhDiemTB() {
     for (auto& p : bangBam) {
         float tong = 0;
-        for (float d : p.second.diem)
-            tong += d;
-        p.second.diemTB = tong / p.second.diem.size();
+        for (int i = 0; i < p.second.soMon; i++)
+            tong += p.second.diem[i];
+        p.second.diemTB = tong / p.second.soMon;
     }
 }
 
-// Sắp xếp + xuất file
 void sapXepVaXuatFile(bool giamDan) {
-    vector<SinhVien> v;
-    for (auto& p : bangBam)
-        v.push_back(p.second);
+    SinhVien ds[MAX_SV];
+    int n = 0;
 
-    sort(v.begin(), v.end(), [giamDan](SinhVien a, SinhVien b) {
-        return giamDan ? a.diemTB > b.diemTB : a.diemTB < b.diemTB;
-        });
+    for (auto& p : bangBam)
+        ds[n++] = p.second;
+
+    // Bubble sort (dễ hiểu)
+    for (int i = 0; i < n - 1; i++) {
+        for (int j = i + 1; j < n; j++) {
+            bool dieuKien = giamDan ?
+                ds[i].diemTB < ds[j].diemTB :
+                ds[i].diemTB > ds[j].diemTB;
+
+            if (dieuKien) {
+                SinhVien tmp = ds[i];
+                ds[i] = ds[j];
+                ds[j] = tmp;
+            }
+        }
+    }
 
     ofstream file("bang_diem.csv");
     file << "MaSV,HoTen";
-    for (auto& m : danhSachMon)
-        file << "," << m;
+    for (int i = 0; i < soMonHoc; i++)
+        file << "," << danhSachMon[i];
     file << ",DiemTB\n";
 
-    for (auto& sv : v) {
-        file << sv.maSV << "," << sv.hoTen;
-        for (float d : sv.diem)
-            file << "," << d;
-        file << "," << sv.diemTB << "\n";
+    for (int i = 0; i < n; i++) {
+        file << ds[i].maSV << "," << ds[i].hoTen;
+        for (int j = 0; j < ds[i].soMon; j++)
+            file << "," << ds[i].diem[j];
+        file << "," << ds[i].diemTB << "\n";
     }
 
     file.close();

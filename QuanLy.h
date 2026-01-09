@@ -1,16 +1,15 @@
 ﻿#pragma once
-#include <vector>
 #include <string>
 #include <unordered_map>
 #include "SinhVien.h"
 
-// Danh sách môn học
-extern std::vector<std::string> danhSachMon;
+#define MAX_SV 100
 
-// Bảng băm sinh viên
+extern std::string danhSachMon[MAX_MON];
+extern int soMonHoc;
+
 extern std::unordered_map<std::string, SinhVien> bangBam;
 
-// Các hàm xử lý
 void nhapMonHoc();
 void themSinhVien();
 void tinhDiemTB();
